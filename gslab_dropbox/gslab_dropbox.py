@@ -11,9 +11,58 @@ class gslab_dropbox(object):
     def __init__(self):
         token = getpass.getpass('Please enter OAuth Token: ')
         self.session = dropbox.dropbox.Dropbox(oauth2_access_token = token)
+
+    # Universal methods
+    def upload(self, local_path, dropbox_path, recursive = True,
+                    overwrite = False, chunk_size = 100 * 1024 * 1024):
+        '''
+        Either uploads a file or a directory based on the local path. See 
+        file and directory specific functions for more details on arguments.
+        '''
+        if os.path.isfile(local_path):
+            self.dropbox_file_upload(dropbox_path, local_path, overwrite, chunk_size)
+
+        elif os.path.isdir(local_path):
+            self.dropbox_directory_upload(dropbox_path, local_path, recursive, overwrite)
+
+        else:
+            raise Exception('%s is neither a local file nor a local directory.' % local_path)
     
-    
-    # File Methods
+
+    def download(self, local_path, dropbox_path, revision = None, overwrite = False,
+                                                    recursive = False, add_pages = None):
+        '''
+        Either download a file or a directory based on the local path. See 
+        file and directory specific functions for more details on arguments.
+        '''
+        if os.path.isfile(local_path):
+            self.dropbox_file_download(dropbox_path, local_path, 
+                                       revision, overwrite)
+
+        elif os.path.isdir(local_path):
+            self.dropbox_directory_download(dropbox_path, local_path, 
+                                            recursive, add_pages, overwrite)
+
+        else:
+            raise Exception('%s is neither a local file nor a local directory.' % local_path)
+
+
+    def remove(self, dropbox_path, recursive = False):
+        '''
+        Either removes a dropbox file or a dropbox directory based on the local path.  
+        See file and directory specific functions for more details on arguments.
+        '''
+        if self.dropbox_file_exists(dropbox_path):
+            self.dropbox_file_remove(dropbox_path)
+
+        elif self.dropbox_directory_exists(dropbox_path):
+            self.dropbox_directory_remove(dropbox_path, recursive)
+
+        else:
+            raise Exception('%s is neither a file nor a directory on dropbox.' % local_path)
+
+
+    # File Specific Methods
     def dropbox_file_exists(self, dropbox_file_path):
         '''
         True if file exists on Dropbox. False if not.
