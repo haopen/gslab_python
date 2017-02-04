@@ -2,6 +2,7 @@ import os
 import re
 import sys
 import time
+import yaml
 import shutil
 import subprocess
 import _exception_classes
@@ -174,3 +175,38 @@ def lyx_scan(node, env, path):
                  for source in src_find.findall(contents)]
 
     return SOURCE
+
+
+def rclone_emitter(target, source, env): # http://scons.org/doc/1.2.0/HTML/scons-user/x3603.html
+    make_list_if_string(source)
+    source_file = str(source[0])
+    check_code_extension(source_file, 'yaml')
+    downloads = yaml.load(open(source_file, 'rU'))
+
+    # Rename remote based on env variable
+    for key in downloads.keys():
+        try:
+            downloads[env[key]] = downloads[key]
+            del downloads[key]
+        except:
+            pass
+
+    # Execute downloads
+    new_targets = []
+    objective_file = 'test.txt'
+    for remote in downloads.keys():
+        for objective in downloads[remote].keys():
+            targ_dir = downloads[remote][objective]
+            os.system("rclone ls %s:%s > %s" % \
+                (remote, objective, objective_file))
+            with open('test.txt', 'rU') as f:
+                listing = f.readlines()
+            listing = [re.split('[0-9]+\s', l)[1].strip() for l in listing]
+            new_targets = new_targets + ['#' + os.path.join(targ_dir, l) for l in listing]
+    os.remove('test.txt')
+    for t in new_targets:
+        target.append(t)
+
+    return target, source
+
+
