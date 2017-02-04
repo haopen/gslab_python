@@ -193,19 +193,27 @@ def rclone_emitter(target, source, env): # http://scons.org/doc/1.2.0/HTML/scons
 
     # Execute downloads
     new_targets = []
-    objective_file = 'test.txt'
+    objective_file = 'file_manifest.txt'
+    if os.path.isfile(objective_file):
+        os.remove(objective_file)
+    with open(objective_file, 'wb') as f:
+        pass
     for remote in downloads.keys():
         for objective in downloads[remote].keys():
             targ_dir = downloads[remote][objective]
-            os.system("rclone ls %s:%s > %s" % \
+            os.system("rclone ls %s:%s >> %s" % \
                 (remote, objective, objective_file))
-            with open('test.txt', 'rU') as f:
-                listing = f.readlines()
-            listing = [re.sub('^[0-9]+\s', '', l.strip()).strip() for l in listing]
-            new_targets = new_targets + ['#' + os.path.join(targ_dir, l) for l in listing]
-    os.remove('test.txt')
+
+    with open(objective_file, 'rU') as f:
+        listing = f.readlines()
+    new_targs = [re.sub('^[0-9]+\s', '', l.strip()).strip() for l in listing]
+    new_targets = new_targets + ['#' + os.path.join(targ_dir, l) for l in new_targs]
     for t in new_targets:
         target.append(t)
+
+    with open(objective_file, 'wb') as f:
+        f.write(''.join(sorted(listing)))
+    source.append([objective_file])
 
     return target, source
 
