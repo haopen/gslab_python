@@ -191,7 +191,7 @@ def rclone_emitter(target, source, env): # http://scons.org/doc/1.2.0/HTML/scons
         except:
             pass
 
-    # Execute downloads
+    # List files that will be downloaded
     new_targets = []
     objective_file = 'file_manifest.txt'
     if os.path.isfile(objective_file):
@@ -204,6 +204,7 @@ def rclone_emitter(target, source, env): # http://scons.org/doc/1.2.0/HTML/scons
             os.system("rclone ls %s:%s >> %s" % \
                 (remote, objective, objective_file))
 
+    # Read file manifest and add to targets
     with open(objective_file, 'rU') as f:
         listing = f.readlines()
     new_targs = [re.sub('^[0-9]+\s', '', l.strip()).strip() for l in listing]
@@ -211,6 +212,7 @@ def rclone_emitter(target, source, env): # http://scons.org/doc/1.2.0/HTML/scons
     for t in new_targets:
         target.append(t)
 
+    # Re-write file manifest after sorting for stable output
     with open(objective_file, 'wb') as f:
         f.write(''.join(sorted(listing)))
     source.append([objective_file])
