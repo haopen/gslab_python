@@ -13,6 +13,7 @@ import os
 import misc
 from .log import start_log, log_timestamp
 from .builders.build_r      import build_r
+from .builders.build_rclone import build_rclone
 from .builders.build_lyx    import build_lyx
 from .builders.build_stata  import build_stata
 from .builders.build_tables import build_tables

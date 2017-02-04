@@ -145,7 +145,8 @@ def check_code_extension(source_file, software):
                   'r'      : '.r', 
                   'lyx'    : '.lyx',
                   'python' : '.py',
-                  'matlab' : '.m'}
+                  'matlab' : '.m',
+                  'yaml'   : '.yaml'}
     ext = extensions[software]
     source_file = str.lower(str(source_file))
     if not source_file.endswith(ext):
