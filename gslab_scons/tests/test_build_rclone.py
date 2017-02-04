@@ -22,7 +22,7 @@ class TestBuildRClone(unittest.TestCase):
         if not os.path.exists('./build/'):
             os.mkdir('./build/')
 
-    @mock.patch('gslab_scons.builders.build_r.os.system')
+    @mock.patch('gslab_scons.builders.build_rclone.os.system')
     def test_standard(self, mock_system):
         '''
         Test that build_r() behaves as expected when used 

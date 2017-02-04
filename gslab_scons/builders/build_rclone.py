@@ -46,10 +46,10 @@ def build_rclone(target, source, env):
     downloads = yaml.load(open(source_file, 'rU'))
 
     # Rename remote based on env variable
-    for r in range(len(downloads) + 1):
+    for key in downloads.keys():
         try:
-            downloads[env[downloads.keys()[r]]] = downloads[downloads.keys()[r]]
-            del downloads[downloads.keys()[r]]
+            downloads[env[key]] = downloads[key]
+            del downloads[key]
         except:
             pass
 
