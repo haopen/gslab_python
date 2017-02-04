@@ -201,7 +201,7 @@ def rclone_emitter(target, source, env): # http://scons.org/doc/1.2.0/HTML/scons
                 (remote, objective, objective_file))
             with open('test.txt', 'rU') as f:
                 listing = f.readlines()
-            listing = [re.split('[0-9]+\s', l)[1].strip() for l in listing]
+            listing = [re.sub('^[0-9]+\s', '', l.strip()).strip() for l in listing]
             new_targets = new_targets + ['#' + os.path.join(targ_dir, l) for l in listing]
     os.remove('test.txt')
     for t in new_targets:
