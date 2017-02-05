@@ -201,13 +201,14 @@ def rclone_emitter(target, source, env): # http://scons.org/doc/1.2.0/HTML/scons
     for remote in downloads.keys():
         for objective in downloads[remote].keys():
             targ_dir = downloads[remote][objective]
-            os.system("rclone ls %s:%s >> %s" % \
+            os.system("rclone lsl %s:%s >> %s" % \
                 (remote, objective, objective_file))
 
     # Read file manifest and add to targets
     with open(objective_file, 'rU') as f:
         listing = f.readlines()
-    new_targs = [re.sub('^[0-9]+\s', '', l.strip()).strip() for l in listing]
+    new_targs = [re.split('\s', l.strip())         for l in listing]
+    new_targs = [' '.join(l[3:len(l)])     for l in new_targs]
     new_targets = new_targets + ['#' + os.path.join(targ_dir, l) for l in new_targs]
     for t in new_targets:
         target.append(t)
